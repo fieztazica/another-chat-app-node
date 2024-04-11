@@ -4,6 +4,7 @@ var path = require('path')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 var mongoose = require('mongoose')
+const { DATABASE_CONNECTION_URL } = require('./config.json')
 
 var indexRouter = require('./routes/index')
 var usersRouter = require('./routes/users')
@@ -14,7 +15,7 @@ var authorsRouter = require('./routes/authors')
 var app = express()
 
 mongoose
-    .connect('mongodb://localhost:27017/testS6')
+    .connect(DATABASE_CONNECTION_URL)
     .then(() => {
         console.log('MongoDB Connected')
     })

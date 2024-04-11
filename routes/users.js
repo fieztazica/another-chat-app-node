@@ -55,6 +55,16 @@ router.get(
 )
 
 /* GET /id*/
+router.get('/@me', protectLogin(), async function (req, res, next) {
+    try {
+        resHandle({ res, data: req.user })
+    } catch (error) {
+        console.error(error)
+        resHandle({ res, status: false, data: error.message })
+    }
+})
+
+/* GET /id*/
 router.get('/:id', async function (req, res, next) {
     try {
         const item = await userModel
