@@ -7,10 +7,11 @@ const protectRole = require('../middlewares/protectRole')
 const resHandle = require('../helpers/resHandle')
 const router = express.Router()
 
+router.use(protectLogin())
+
 /* GET */
 router.get(
     '/',
-    protectLogin(),
     protectRole('ADMIN', 'MODERATOR'),
     async function (req, res, next) {
         const limit = req.query.limit || 1
@@ -55,7 +56,7 @@ router.get(
 )
 
 /* GET /id*/
-router.get('/@me', protectLogin(), async function (req, res, next) {
+router.get('/@me', async function (req, res, next) {
     try {
         resHandle({ res, data: req.user })
     } catch (error) {
@@ -65,20 +66,24 @@ router.get('/@me', protectLogin(), async function (req, res, next) {
 })
 
 /* GET /id*/
-router.get('/:id', async function (req, res, next) {
-    try {
-        const item = await userModel
-            .find({
-                _id: decodeURIComponent(req.params.id),
-                isDeleted: false,
-            })
-            .exec()
-        resHandle({ res, data: item })
-    } catch (error) {
-        console.error(error)
-        resHandle({ res, status: false, data: error.message })
+router.get(
+    '/:id',
+    protectRole('ADMIN', 'MODERATOR'),
+    async function (req, res, next) {
+        try {
+            const item = await userModel
+                .find({
+                    _id: decodeURIComponent(req.params.id),
+                    isDeleted: false,
+                })
+                .exec()
+            resHandle({ res, data: item })
+        } catch (error) {
+            console.error(error)
+            resHandle({ res, status: false, data: error.message })
+        }
     }
-})
+)
 
 /* POST */
 router.post('/', userValidator(), async function (req, res, next) {
@@ -115,22 +120,26 @@ router.put('/:id', async function (req, res, next) {
 })
 
 /* DELETE */
-router.delete('/:id', async function (req, res, next) {
-    try {
-        const item = await userModel.findByIdAndUpdate(
-            req.params.id,
-            {
-                isDeleted: true,
-            },
-            {
-                new: true,
-            }
-        )
-        resHandle({ res, data: item })
-    } catch (error) {
-        console.error(error)
-        resHandle({ res, status: false, data: error.message })
+router.delete(
+    '/:id',
+    protectRole('ADMIN', 'MODERATOR'),
+    async function (req, res, next) {
+        try {
+            const item = await userModel.findByIdAndUpdate(
+                req.params.id,
+                {
+                    isDeleted: true,
+                },
+                {
+                    new: true,
+                }
+            )
+            resHandle({ res, data: item })
+        } catch (error) {
+            console.error(error)
+            resHandle({ res, status: false, data: error.message })
+        }
     }
-})
+)
 
 module.exports = router

@@ -12,11 +12,13 @@ const userSchema = mongoose.Schema(
         password: {
             type: String,
             required: true,
+            select: false,
         },
         email: {
             type: String,
             required: true,
             unique: true,
+            select: false,
         },
         status: {
             type: Boolean,
@@ -31,10 +33,12 @@ const userSchema = mongoose.Schema(
 
         tokenResetPassword: {
             type: String,
+            select: false,
         },
 
         tokenResetPasswordExp: {
             type: String,
+            select: false,
         },
 
         isDeleted: {

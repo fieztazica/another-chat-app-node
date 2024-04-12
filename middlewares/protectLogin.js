@@ -41,7 +41,7 @@ module.exports = () =>
             return throwError()
         }
 
-        const item = await userModel.findById(info.id)
+        const item = await userModel.findById(info.id).select('+email').exec()
         if (!item) {
             return throwError()
         }

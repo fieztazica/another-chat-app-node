@@ -48,7 +48,10 @@ router.post('/login', async function (req, res, next) {
                 data: 'Username or password incorrect',
             })
         }
-        const item = await userModel.findOne({ username })
+        const item = await userModel
+            .findOne({ username })
+            .select('+password')
+            .exec()
         if (!item) {
             return resHandle({
                 res,
@@ -97,7 +100,10 @@ router.post(
                 return
             }
 
-            let user = await userModel.findOne({ email })
+            let user = await userModel
+                .findOne({ email })
+                .select('+email')
+                .exec()
 
             if (!user) {
                 return resHandle({
@@ -129,9 +135,12 @@ router.post(
     validationChecker(strongPassword()),
     async function (req, res, next) {
         try {
-            let user = await userModel.findOne({
-                tokenResetPassword: req.params.token,
-            })
+            let user = await userModel
+                .findOne({
+                    tokenResetPassword: req.params.token,
+                })
+                .select('+tokenResetPassword +tokenResetPasswordExp')
+                .exec()
 
             if (!user) {
                 resHandle({ res, data: 'URL khong hop le' })
