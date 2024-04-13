@@ -40,7 +40,6 @@ const userSchema = mongoose.Schema(
             type: String,
             select: false,
         },
-
         isDeleted: {
             type: Boolean,
             default: false,

@@ -9,6 +9,6 @@ module.exports = function () {
         check('username').isLength(options.USERNAME.length),
         isEmail(),
         isStrongPassword(),
-        check('role').isIn(options.ROLES.enums),
+        check('role').default(['USER']).isIn(options.ROLES.enums).optional(),
     ]
 }

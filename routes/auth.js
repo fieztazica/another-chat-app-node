@@ -1,7 +1,6 @@
 const express = require('express')
 const { compare } = require('bcrypt')
 const { SECRET_KEY, COOKIE_TOKEN_KEY, SITE_URL } = require('../config.json')
-const { check, body, validationResult } = require('express-validator')
 const userModel = require('../schemas/user')
 const jwt = require('jsonwebtoken')
 const userValidator = require('../validators/isUserValid')
@@ -13,6 +12,7 @@ const isEmail = require('../validators/isEmail')
 const protectLogin = require('../middlewares/protectLogin')
 const isStrongPassword = require('../validators/isStrongPassword')
 const router = express.Router()
+require("express-async-errors")
 
 router.post(
     '/register',
@@ -20,6 +20,7 @@ router.post(
     async function (req, res, next) {
         try {
             const item = new userModel(req.body)
+            item.role = req.body.role || ['USER']
             await item.save()
             const { token } = genJwt({ content: { id: item._id }, res })
             resHandle({

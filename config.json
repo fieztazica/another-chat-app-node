@@ -8,6 +8,6 @@
         "Password": "379df636dc0994"
     },
     "SITE_URL": "localhost:3000",
-    "DATABASE_CONNECTION_URL": "mongodb://localhost:27017/testS6",
+    "DATABASE_CONNECTION_URL": "mongodb://localhost:27017/aca",
     "ROOM_ID_LENGTH": 8
 }

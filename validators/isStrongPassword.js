@@ -1,5 +1,4 @@
 const { check } = require('express-validator')
-const util = require('util')
 const { options, messages } = require('./config')
 
 /**
