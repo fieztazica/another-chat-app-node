@@ -74,6 +74,25 @@ router.get('/', async function (req, res, next) {
 })
 
 /* GET room by id. */
+router.get('/@mine', async function (req, res, next) {
+    try {
+        const rooms = await roomModel
+            .find({
+                isDeleted: false,
+                owner: req.user._id,
+            })
+            .populate('owner')
+            .lean()
+            .exec()
+
+        resHandle({ res, data: rooms })
+    } catch (error) {
+        console.error(error)
+        resHandle({ res, status: false, data: error.message })
+    }
+})
+
+/* GET room by id. */
 router.get('/:id', async function (req, res, next) {
     try {
         const reqId = decodeURIComponent(req.params.id)

@@ -7,6 +7,7 @@ const authenticate = require('./auth')
 
 let rooms = []
 let indicators = {}
+let presences = new Map()
 
 const io = new Server({
     cors: {
@@ -27,10 +28,19 @@ io.of(roomRegExp)
         }
 
         const reqRoomId = socket.nsp.name.split('/').pop()
+
         if (!reqRoomId) {
             socket.disconnect()
             return
         }
+
+        if (!presences.has(reqRoomId)) {
+            presences.set(reqRoomId, new Map())
+        }
+
+        socket.on(EventNames.Disconnect, (reason) => {
+            presences.get(reqRoomId).delete(socket.user._id)
+        })
 
         const room = await roomModel
             .findOne({
@@ -45,9 +55,12 @@ io.of(roomRegExp)
             return
         }
 
+        presences.get(reqRoomId).set(socket.user._id, socket.user)
+
         const helloMessage = {
             content: `${socket.user.username} joined the room!`,
             room: room.roomId,
+            updatedAt: new Date(),
         }
 
         const last100Messages = await messageModel
@@ -62,6 +75,13 @@ io.of(roomRegExp)
             .exec()
 
         socket.sendAll(EventNames.Messages, helloMessage)
+
+        console.log(presences.get(reqRoomId).values())
+
+        socket.sendAll(
+            EventNames.Presence,
+            Array.from(presences.get(reqRoomId).values())
+        )
 
         socket.emit(EventNames.Connected, {
             room,
@@ -123,4 +143,6 @@ const EventNames = {
     Error: 'error',
     SendIndicator: 'send_indicator',
     Indicator: 'indicator',
+    Presence: 'presence',
+    Disconnect: 'disconnect',
 }
