@@ -12,7 +12,7 @@ const isEmail = require('../validators/isEmail')
 const protectLogin = require('../middlewares/protectLogin')
 const isStrongPassword = require('../validators/isStrongPassword')
 const router = express.Router()
-require("express-async-errors")
+require('express-async-errors')
 
 router.post(
     '/register',
@@ -119,9 +119,17 @@ router.post(
             console.log(user.tokenResetPassword)
             await user.save()
 
-            let url = `http://${SITE_URL}/auth/password-reset/${token}`
+            const url = new URL(
+                `/reset-password/${token}`,
+                `http://${SITE_URL}`
+            )
 
-            await sendMail(`Your password reset link: ${url}`, user.email)
+            await sendMail(
+                `Another Chat App`,
+                `Your password reset link: ${url}`,
+                `<a target="_blank" href="${url}">Click here to reset your password</a>`,
+                user.email
+            )
 
             resHandle({ res })
         } catch (error) {
@@ -133,9 +141,19 @@ router.post(
 
 router.post(
     '/password-reset/:token',
-    validationChecker(strongPassword()),
+    validationChecker(strongPassword(['newPassword', 'confirmNewPassword'])),
     async function (req, res, next) {
         try {
+            const newPassword = req.body.newPassword
+            const confirmNewPassword = req.body.confirmNewPassword
+            if (newPassword != confirmNewPassword) {
+                return resHandle({
+                    res,
+                    status: false,
+                    data: 'Mat khau moi khong trung nhau',
+                })
+            }
+
             let user = await userModel
                 .findOne({
                     tokenResetPassword: req.params.token,
@@ -149,7 +167,7 @@ router.post(
             }
 
             if (new Date(user.tokenResetPasswordExp).getTime() > Date.now()) {
-                user.password = req.body.password
+                user.password = newPassword
                 user.tokenResetPasswordExp = undefined
                 user.tokenResetPassword = undefined
                 await user.save()
