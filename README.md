@@ -14,7 +14,9 @@ pnpm dev
 bun dev
 ```
 
-Reach [another-chat-app-client](https://github.com/fieztazica/another-chat-app-client) to get **Client Server** source code.
+Open [http://localhost:5000](http://localhost:5000) with your browser to see the result.
+
+Then, reach [another-chat-app-client](https://github.com/fieztazica/another-chat-app-client) to get **Client Server** source code.
 
 ## Configuration
 
