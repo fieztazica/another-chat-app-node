@@ -9,12 +9,19 @@ const roomSchema = mongoose.Schema(
         roomId: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
         },
         owner: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
+            ref: 'user',
         },
+        members: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'user',
+                index: { unique: true, dropDups: true },
+            },
+        ],
         isDeleted: {
             type: Boolean,
             default: false,

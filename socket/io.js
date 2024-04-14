@@ -35,19 +35,15 @@ io.of(roomRegExp)
         }
 
         if (!presences.has(reqRoomId)) {
-            presences.set(reqRoomId, new Map())
+            presences.set(reqRoomId, new Set())
         }
-
-        socket.on(EventNames.Disconnect, (reason) => {
-            presences.get(reqRoomId).delete(socket.user._id)
-        })
 
         const room = await roomModel
             .findOne({
                 isDeleted: false,
                 roomId: reqRoomId,
             })
-            .populate('owner')
+            .populate('owner members')
             .exec()
 
         if (!room) {
@@ -55,7 +51,46 @@ io.of(roomRegExp)
             return
         }
 
-        presences.get(reqRoomId).set(socket.user._id, socket.user)
+        socket.once(EventNames.Disconnect, (reason) => {
+            presences
+                .get(reqRoomId)
+                .forEach((v) =>
+                    v._id == socket.user._id
+                        ? presences.get(reqRoomId).delete(v)
+                        : v
+                )
+            socket.sendAll(
+                EventNames.Presence,
+                calPresences(presences.get(reqRoomId))
+            )
+        })
+
+        function calPresences(onlines = new Set()) {
+            onlines = Array.from(onlines.values())
+            const array = room.members.map((m) => ({
+                _id: m._id,
+                username: m.username,
+                online: onlines.some(
+                    (o) => o._id == m._id || o.username == m.username
+                ),
+            }))
+            return array
+        }
+
+        if (
+            !room.members.some(
+                (m) =>
+                    m._id == socket.user._id ||
+                    m.username == socket.user.username ||
+                    m.email == socket.user.email
+            )
+        ) {
+            room.members.push(socket.user._id)
+            await room.save()
+            // console.log(room.members)
+        }
+
+        presences.get(reqRoomId).add(socket.user)
 
         const helloMessage = {
             content: `${socket.user.username} joined the room!`,
@@ -69,18 +104,16 @@ io.of(roomRegExp)
                 room: room,
             })
             .populate('room author')
-            .lean()
             .sort({ updatedAt: -1, createdAt: -1 })
             .limit(100)
+            .lean()
             .exec()
 
         socket.sendAll(EventNames.Messages, helloMessage)
 
-        console.log(presences.get(reqRoomId).values())
-
         socket.sendAll(
             EventNames.Presence,
-            Array.from(presences.get(reqRoomId).values())
+            calPresences(presences.get(reqRoomId))
         )
 
         socket.emit(EventNames.Connected, {
@@ -145,4 +178,5 @@ const EventNames = {
     Indicator: 'indicator',
     Presence: 'presence',
     Disconnect: 'disconnect',
+    Disconnecting: 'disconnecting',
 }
