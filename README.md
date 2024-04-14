@@ -21,6 +21,7 @@ Then, reach [another-chat-app-client](https://github.com/fieztazica/another-chat
 ## Configuration
 
 ```json
+// config.json
 {
     "SECRET_KEY": "secret_key",
     "COOKIE_TOKEN_KEY": "TOKEN",
