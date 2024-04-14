@@ -1,7 +1,7 @@
 # Another Chat App - Node Server
 
-
 ### Configuration
+
 ```json
 {
     "SECRET_KEY": "secret_key",
