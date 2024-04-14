@@ -1,0 +1,13 @@
+{
+    "SECRET_KEY": "secret_key",
+    "COOKIE_TOKEN_KEY": "TOKEN",
+    "email": {
+        "Host": "host.smtp.another-chat-app.com",
+        "Port": 465,
+        "Username": "user",
+        "Password": "highendencryptedpassword"
+    },
+    "SITE_URL": "localhost:3000",
+    "DATABASE_CONNECTION_URL": "mongodb://localhost:27017/db_name",
+    "ROOM_ID_LENGTH": 8
+}

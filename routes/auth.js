@@ -116,7 +116,6 @@ router.post(
             }
 
             const token = user.genTokenResetPassword()
-            console.log(user.tokenResetPassword)
             await user.save()
 
             const url = new URL(
@@ -160,13 +159,12 @@ router.post(
                 })
                 .select('+tokenResetPassword +tokenResetPasswordExp')
                 .exec()
-
             if (!user) {
                 resHandle({ res, data: 'URL khong hop le' })
                 return
             }
-
-            if (new Date(user.tokenResetPasswordExp).getTime() > Date.now()) {
+            
+            if (Number.parseInt(user.tokenResetPasswordExp) > Date.now()) {
                 user.password = newPassword
                 user.tokenResetPasswordExp = undefined
                 user.tokenResetPassword = undefined
@@ -177,7 +175,7 @@ router.post(
                     data: 'Doi mat khau thanh cong',
                 })
             } else {
-                resHandle({ res, status: false, data: 'URL khong hop le' })
+                resHandle({ res, status: false, data: 'Token expired' })
                 return
             }
         } catch (error) {

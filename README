@@ -1,0 +1,19 @@
+# Another Chat App - Node Server
+
+
+### Configuration
+```json
+{
+    "SECRET_KEY": "secret_key",
+    "COOKIE_TOKEN_KEY": "TOKEN",
+    "email": {
+        "Host": "email_host",
+        "Port": 465,
+        "Username": "email_username",
+        "Password": "email_password"
+    },
+    "SITE_URL": "frontend_site_url <host:port>",
+    "DATABASE_CONNECTION_URL": "mongo db connection string",
+    "ROOM_ID_LENGTH": 8 // default room id length
+}
+```
