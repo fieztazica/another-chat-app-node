@@ -71,6 +71,7 @@ io.of(roomRegExp)
                 _id: m._id,
                 username: m.username,
                 online: onlines.some((o) => m._id.equals(o._id)),
+                createdAt: m.createdAt
             }))
             return array
         }
