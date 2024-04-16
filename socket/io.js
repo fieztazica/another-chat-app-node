@@ -43,7 +43,7 @@ io.of(roomRegExp)
                 isDeleted: false,
                 roomId: reqRoomId,
             })
-            .populate('owner members')
+            .populate('owner members', '+email')
             .exec()
 
         if (!room) {
@@ -55,7 +55,7 @@ io.of(roomRegExp)
             presences
                 .get(reqRoomId)
                 .forEach((v) =>
-                    v._id == socket.user._id
+                    socket.user._id.equals(v._id)
                         ? presences.get(reqRoomId).delete(v)
                         : v
                 )
@@ -70,33 +70,27 @@ io.of(roomRegExp)
             const array = room.members.map((m) => ({
                 _id: m._id,
                 username: m.username,
-                online: onlines.some(
-                    (o) => o._id == m._id || o.username == m.username
-                ),
+                online: onlines.some((o) => m._id.equals(o._id)),
             }))
             return array
         }
 
-        if (
-            !room.members.some(
-                (m) =>
-                    m._id == socket.user._id ||
-                    m.username == socket.user.username ||
-                    m.email == socket.user.email
-            )
-        ) {
+        const equalStatement = (user) => socket.user._id.equals(user._id)
+
+        if (!room.members.some(equalStatement)) {
             room.members.push(socket.user._id)
             await room.save()
-            // console.log(room.members)
+
+            const helloMessage = {
+                content: `${socket.user.username} joined the room!`,
+                room: room.roomId,
+                updatedAt: new Date(),
+            }
+
+            socket.sendAll(EventNames.Messages, helloMessage)
         }
 
         presences.get(reqRoomId).add(socket.user)
-
-        const helloMessage = {
-            content: `${socket.user.username} joined the room!`,
-            room: room.roomId,
-            updatedAt: new Date(),
-        }
 
         const last100Messages = await messageModel
             .find({
@@ -108,8 +102,6 @@ io.of(roomRegExp)
             .limit(100)
             .lean()
             .exec()
-
-        socket.sendAll(EventNames.Messages, helloMessage)
 
         socket.sendAll(
             EventNames.Presence,

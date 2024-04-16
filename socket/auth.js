@@ -23,7 +23,7 @@ const authenticate = () =>
             return
         }
 
-        const item = await userModel.findById(info.id)
+        const item = await userModel.findById(info.id).select("+email")
         if (!item) {
             next(new Error('User not found'))
             return

@@ -79,7 +79,14 @@ router.get('/@mine', async function (req, res, next) {
         const rooms = await roomModel
             .find({
                 isDeleted: false,
-                owner: req.user._id,
+                $or: [
+                    {
+                        members: req.user._id,
+                    },
+                    {
+                        owner: req.user._id,
+                    },
+                ],
             })
             .populate('owner')
             .lean()
