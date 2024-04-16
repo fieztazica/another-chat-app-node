@@ -119,8 +119,8 @@ io.of(roomRegExp)
                 room: room,
                 author: socket.user,
             })
-            await message.save()
             socket.sendAll(EventNames.Messages, message)
+            await message.save()
         })
 
         socket.on(EventNames.SendIndicator, async function (data, ack) {
