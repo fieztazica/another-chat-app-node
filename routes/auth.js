@@ -163,7 +163,7 @@ router.post(
                 resHandle({ res, data: 'URL khong hop le' })
                 return
             }
-            
+
             if (Number.parseInt(user.tokenResetPasswordExp) > Date.now()) {
                 user.password = newPassword
                 user.tokenResetPasswordExp = undefined
@@ -205,7 +205,14 @@ router.post(
                 })
             }
 
-            const result = await compare(password, req.user.password)
+            const user = await userModel
+                .findOne({
+                    _id: req.user._id,
+                })
+                .select('+password')
+                .exec()
+
+            const result = await compare(password, user.password)
             if (!result) {
                 return resHandle({
                     res,
