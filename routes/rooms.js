@@ -146,8 +146,13 @@ router.post('/', async function (req, res, next) {
 /* PUT  edit a room . */
 router.put('/:id', async function (req, res, next) {
     try {
-        const room = await roomModel.findByIdAndUpdate(
-            req.params.id,
+        const reqId = decodeURIComponent(req.params.id)
+        const findQueryKey = reqId.length == ROOM_ID_LENGTH ? 'roomId' : '_id'
+        const room = await roomModel.findOneAndUpdate(
+            {
+                [findQueryKey]: reqId,
+                isDeleted: false,
+            },
             req.body,
             {
                 new: true,
@@ -163,8 +168,13 @@ router.put('/:id', async function (req, res, next) {
 /* DELETE delete a room . */
 router.delete('/:id', async function (req, res, next) {
     try {
-        const room = await roomModel.findByIdAndUpdate(
-            req.params.id,
+        const reqId = decodeURIComponent(req.params.id)
+        const findQueryKey = reqId.length == ROOM_ID_LENGTH ? 'roomId' : '_id'
+        const room = await roomModel.findOneAndUpdate(
+            {
+                [findQueryKey]: reqId,
+                isDeleted: false,
+            },
             {
                 isDeleted: true,
             },
