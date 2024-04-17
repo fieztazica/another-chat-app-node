@@ -27,7 +27,7 @@ router.post(
                 res,
                 data: {
                     token,
-                    item,
+                    user: item,
                 },
             })
         } catch (error) {
@@ -78,7 +78,10 @@ router.post('/login', async function (req, res, next) {
 
         resHandle({
             res,
-            data: token,
+            data: {
+                token,
+                user: item,
+            },
         })
     } catch (error) {
         console.error(error)

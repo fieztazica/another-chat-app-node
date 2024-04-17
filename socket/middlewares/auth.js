@@ -1,6 +1,6 @@
-const cookieExtractor = require('../helpers/cookies')
-const { verifyToken } = require('../helpers/jwt')
-const userModel = require('../schemas/user')
+const cookieExtractor = require('../../helpers/cookies')
+const { verifyToken } = require('../../helpers/jwt')
+const userModel = require('../../schemas/user')
 
 const authenticate = () =>
     async function (socket, next) {
@@ -23,7 +23,7 @@ const authenticate = () =>
             return
         }
 
-        const item = await userModel.findById(info.id).select("+email")
+        const item = await userModel.findById(info.id).select('+email')
         if (!item) {
             next(new Error('User not found'))
             return
